@@ -1,4 +1,9 @@
 import type { Config } from "@measured/puck";
+import {
+  sentenceThemes,
+  wordRoles,
+  emphasisLevels,
+} from "./germanSentenceTokens";
 
 
 console.log("AI key present:", !!process.env.OPENAI_API_KEY);
@@ -12,6 +17,8 @@ type Props = {
     verb: string;
     object: string;
     explanation: string;
+    theme: keyof typeof sentenceThemes;
+    emphasis: keyof typeof emphasisLevels;
   };
 };
 
@@ -31,60 +38,92 @@ const config: Config<Props> = {
       ),
     },
 
-    // 👇 NEW BLOCK
     GermanSentenceBlock: {
       fields: {
         subject: { type: "text", label: "Subject" },
         verb: { type: "text", label: "Verb" },
         object: { type: "text", label: "Object" },
+    
         explanation: {
           type: "textarea",
           label: "Grammar explanation",
         },
+    
+        theme: {
+          type: "select",
+          label: "Sentence type",
+          options: [
+            { label: "Neutral", value: "neutral" },
+            { label: "Example", value: "example" },
+            { label: "Common mistake", value: "warning" },
+          ],
+        },
+    
+        emphasis: {
+          type: "select",
+          label: "Visual emphasis",
+          options: [
+            { label: "Low", value: "low" },
+            { label: "Medium", value: "medium" },
+            { label: "High", value: "high" },
+          ],
+        },
       },
-
+    
       defaultProps: {
         subject: "Ich",
         verb: "lerne",
         object: "Deutsch",
         explanation: "The verb is in second position in German main clauses.",
+        theme: "example",
+        emphasis: "medium",
       },
 
-      render: ({ subject, verb, object, explanation }) => {
+
+      render: ({
+        subject,
+        verb,
+        object,
+        explanation,
+        theme,
+        emphasis,
+      }) => {
+        const resolvedTheme = theme ?? "neutral";
+        const resolvedEmphasis = emphasis ?? "medium";
+
+        const themeTokens = sentenceThemes[resolvedTheme];
+        const emphasisTokens = emphasisLevels[resolvedEmphasis];
+      
         return (
           <div
-            className="german-sentence-block"
             style={{
               padding: "1.5rem",
-              border: "1px solid #e0e0e0",
               borderRadius: "8px",
-              backgroundColor: "#f9f9f9",
               margin: "1rem 0",
+              backgroundColor: themeTokens.container.background,
+              border: `1px solid ${themeTokens.container.border}`,
             }}
           >
             <div
-              className="sentence"
               style={{
-                fontSize: "1.25rem",
-                fontWeight: "600",
+                ...emphasisTokens,
                 marginBottom: "1rem",
-                color: "#333",
+                color: themeTokens.text,
               }}
             >
-              <span style={{ color: "#0066cc" }}>{subject}</span>{" "}
-              <span style={{ color: "#cc6600" }}>{verb}</span>{" "}
-              <span style={{ color: "#009900" }}>{object}</span>
+              <span style={{ color: wordRoles.subject }}>{subject}</span>{" "}
+              <span style={{ color: wordRoles.verb }}>{verb}</span>{" "}
+              <span style={{ color: wordRoles.object }}>{object}</span>
             </div>
-
+      
             {explanation && (
               <div
-                className="explanation"
                 style={{
                   fontSize: "0.9rem",
-                  color: "#666",
                   fontStyle: "italic",
                   paddingTop: "0.75rem",
-                  borderTop: "1px solid #e0e0e0",
+                  borderTop: `1px solid ${themeTokens.container.border}`,
+                  color: themeTokens.explanation,
                 }}
               >
                 {explanation}
