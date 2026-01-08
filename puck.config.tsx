@@ -6,9 +6,8 @@ import {
 } from "./germanSentenceTokens";
 
 
-console.log("AI key present:", !!process.env.OPENAI_API_KEY);
+//console.log("AI key present:", !!process.env.OPENAI_API_KEY);
 
-import type { Config } from "@measured/puck";
 
 type Props = {
   HeadingBlock: { title: string };
