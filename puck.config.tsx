@@ -1,4 +1,4 @@
-import type { Config } from "@measured/puck";
+import type { Config as PuckConfig } from "@measured/puck";
 import {
   sentenceThemes,
   wordRoles,
@@ -21,7 +21,7 @@ type Props = {
   };
 };
 
-const config: Config<Props> = {
+const config: PuckConfig<Props> = {
   components: {
     HeadingBlock: {
       fields: {
